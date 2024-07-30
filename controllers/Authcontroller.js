@@ -5,7 +5,15 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer')
 
+const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
 
+const generateOtp = () => Math.floor(100000 + Math.random() * 900000); 
 
 const signup = async (req, res, next) => {
     try {

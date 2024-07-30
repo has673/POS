@@ -18,6 +18,7 @@ model User {
   username      String    @unique
   password      String
   email         String    @unique
+  OTP           Int?
   profilePicture String? // Optional field for profile picture URL
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt

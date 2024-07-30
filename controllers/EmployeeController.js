@@ -21,7 +21,7 @@ const addemployee = async(req,res,next)=>{
         return res.status(200).json({ error:"internal server error"})
     }
 }
-const getemployee=async(req,res,next)=>{
+const getemployees=async(req,res,next)=>{
     try{
         const get = await prisma.employee.findMany()
         console.log(get)
@@ -32,7 +32,53 @@ const getemployee=async(req,res,next)=>{
         return res.status(200).json({ error:"internal server error"})
     }
 }
+const getemployee=async(req,res,next)=>{
+    try{
+        const { id } = req.params;
+
+        // Fetch a single employee by ID
+        const employee = await prisma.employee.findUnique({
+            where: { id: parseInt(id, 10) }, // Ensure the ID is an integer
+        });
+
+        // Check if employee exists
+        if (!employee) {
+            return res.status(404).json({ error: 'Employee not found' });
+        }
+
+        // Return the employee data
+        return res.status(200).json(employee);
+    }
+    catch(err){
+        console.log(err)
+        return res.status(200).json({ error:"internal server error"})
+    }
+}
+const deleteemployee=async(req,res,next)=>{
+    try{
+        const { id } = req.params;
+
+        // Fetch a single employee by ID
+        const employee = await prisma.employee.delete({
+            where: { id: parseInt(id, 10) }, // Ensure the ID is an integer
+        });
+
+        // Check if employee exists
+        if (!employee) {
+            return res.status(404).json({ error: 'Employee not found' });
+        }
+
+        // Return the employee data
+        return res.status(200).json(employee);
+    }
+    catch(err){
+        console.log(err)
+        return res.status(200).json({ error:"internal server error"})
+    }
+}
 module.exports={
     addemployee,
-    getemployee
+    getemployees,
+    getemployee,
+    deleteemployee
 }
