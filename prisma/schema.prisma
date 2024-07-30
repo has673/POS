@@ -19,6 +19,7 @@ model User {
   password      String
   email         String    @unique
   OTP           Int?
+  verified      Boolean?   @default(false)
   profilePicture String? // Optional field for profile picture URL
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt

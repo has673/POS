@@ -5,13 +5,22 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer')
 
+// const transporter = nodemailer.createTransport({
+//     service: 'Gmail',
+//     auth: {
+//         user: process.env.EMAIL_USER,
+//         pass: process.env.EMAIL_PASS
+//     }
+// });
 const transporter = nodemailer.createTransport({
-    service: 'Gmail',
+    host: 'smtp.mailtrap.io',
+    port: 587,
     auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
+        user: process.env.MAILTRAP_USER,
+        pass: process.env.MAILTRAP_PASS
     }
 });
+
 
 const generateOtp = () => Math.floor(100000 + Math.random() * 900000); 
 
@@ -22,32 +31,54 @@ const signup = async (req, res, next) => {
         // Check if user already exists
         const existingUser = await prisma.user.findFirst({
             where: {
-                email: email,
-                username:username,
+                OR: [
+                    { email: email },
+                    { username: username },
+                ],
             },
         });
 
         if (existingUser) {
-            return res.status(400).json({ error: 'Email taken' });
+            return res.status(400).json({ error: 'Email or Username taken' });
         }
-        const newpass = await bcrypt.hash(password,10)
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const otp = generateOtp();
+        const otp_int = parseInt(otp)
+
         const newUser = await prisma.user.create({
             data: {
                 username: username,
-                email:email,
-                password:newpass,
+                email: email,
+                password: hashedPassword,
+                OTP:  otp_int,
             },
         });
 
-        // Exclude sensitive information from the response
-        const { password: _, ...userWithoutPassword } = newUser;
-        console.log('user added')
-        return res.status(201).json(userWithoutPassword); // 201 Created
+        const mailOptions = {
+            from: process.env.MAILTRAP_USER,
+            to: email,
+            subject: 'Your OTP Code',
+            text: `Your OTP code is ${ otp_int}`,
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error(error);
+                return res.status(500).json({ error: 'Error sending OTP' });
+            }
+            console.log('Email sent: ' + info.response);
+            // Ensure the response is sent here
+            const { password: _, otp: __, ...userWithoutSensitiveInfo } = newUser;
+            return res.status(201).json(userWithoutSensitiveInfo);
+        });
+
     } catch (err) {
         console.error(err);
         return res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
 const login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
@@ -128,6 +159,38 @@ const recoverPassword = async (req, res, next) => {
     }
 };
 
+const verifyotp = async(req,res,next)=>{
+    try{
+        const {email,otp}=req.body
+        const checkuser = await prisma.user.findUnique({
+            where:{
+                email:email,
+                OTP:otp
+            }
+        })
+      
+        if (!user) {
+            return res.status(400).json({ error: 'Invalid OTP' });
+        }
+
+        // Update user to clear OTP after successful verification
+        await prisma.user.update({
+            where: { email: email },
+            data: { 
+                OTP: null ,
+                verified:true
+
+            },
+        });
+         console.log('user verified')
+        return res.status(200).json({ message: 'OTP verified successfully' });
+
+    }
+    catch(err){
+        console.log(err)
+    }
+}
+
 
 
 
@@ -135,5 +198,6 @@ const recoverPassword = async (req, res, next) => {
 module.exports={
     signup,
     login,
-    recoverPassword
+    recoverPassword,
+    verifyotp
 }
