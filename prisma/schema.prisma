@@ -22,6 +22,22 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
+
+model Employee {
+  id            Int       @id @default(autoincrement())
+  Name          String    
+  email         String    @unique
+  salary        Int?     
+  Phonenumber   BigInt?
+  dateofbirth   DateTime?
+  Address        String?
+  Details       String?
+  Starttime      DateTime?
+  profilePicture String? // Optional field for profile picture URL
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
 model Category {
   id          Int      @id @default(autoincrement())
   icon        String?
