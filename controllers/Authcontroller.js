@@ -2,6 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
 const signup = async (req, res, next) => {
     try {
@@ -11,22 +12,19 @@ const signup = async (req, res, next) => {
         const existingUser = await prisma.user.findFirst({
             where: {
                 email: email,
+                username:username,
             },
         });
 
         if (existingUser) {
             return res.status(400).json({ error: 'Email taken' });
         }
-
-        // Hash the password before storing it
-        // const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Create new user
+        const newpass = await bcrypt.hash(password,10)
         const newUser = await prisma.user.create({
             data: {
                 username: username,
                 email:email,
-                password:password,
+                password:newpass,
             },
         });
 
@@ -41,17 +39,17 @@ const signup = async (req, res, next) => {
 };
 const login = async (req, res, next) => {
     try {
-        const { username, password } = req.body;
+        const { email, password } = req.body;
 
         // Check if user exists
         const user = await prisma.user.findFirst({
             where: {
-                username: username,
+                email: email,
             },
         });
 
         if (!user) {
-            return res.status(400).json({ error: 'Invalid username or password' });
+            return res.status(400).json({ error: 'Invalid email' });
         }
 
         // Compare provided password with stored hashed password
@@ -61,7 +59,6 @@ const login = async (req, res, next) => {
             return res.status(400).json({ error: 'Invalid username or password' });
         }
 
-        // Generate a JWT token (assuming you have a secret key in your environment variables)
         const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
             expiresIn: '1h', // Token expiration time
         });
@@ -81,10 +78,17 @@ const login = async (req, res, next) => {
     }
 };
 
+
 const recoverPassword = async (req, res, next) => {
     try {
-        const { email, newPassword } = req.body;
-        
+        const { email, password } = req.body;
+
+        // Validate input
+        if (!email || !password) {
+            console.log('Email and Password are required');
+            return res.status(400).json({ error: 'Email and Password are required' });
+        }
+
         // Find user by email
         const user = await prisma.user.findFirst({
             where: { email: email },
@@ -95,7 +99,7 @@ const recoverPassword = async (req, res, next) => {
         }
 
         // Hash the new password
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         // Update user's password
         await prisma.user.update({
@@ -112,6 +116,10 @@ const recoverPassword = async (req, res, next) => {
         return res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
+
+
+
 
 module.exports={
     signup,
