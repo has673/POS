@@ -169,7 +169,7 @@ const verifyotp = async(req,res,next)=>{
             }
         })
       
-        if (!user) {
+        if (!checkuser) {
             return res.status(400).json({ error: 'Invalid OTP' });
         }
 
