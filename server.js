@@ -5,6 +5,7 @@ const Catrouter = require('./Routes/Category');
 const Authrouter = require('./Routes/Auth');
 const Adminrouter =  require('./Routes/Admin')
 const Employeerouter = require('./Routes/Employee')
+const Itemrouter = require('./Routes/Item')
 // Middleware
 app.use(express.json()); // For parsing application/json
 
@@ -19,6 +20,8 @@ app.use('/auth',Authrouter)
 app.use('/admin',Adminrouter)
 
 app.use('/employee',Employeerouter)
+
+app.use('/item', Itemrouter)
 
 // Start server
 app.listen(port, () => {
