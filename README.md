@@ -1,1 +1,1 @@
-Express Backedn for Point of sale , using Prisma and postgress sql
+Express Backend for Point of sale , using Prisma and postgress sql
