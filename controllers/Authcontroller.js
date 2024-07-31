@@ -103,9 +103,11 @@ const login = async (req, res, next) => {
         }
 
         const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
+           
             expiresIn: '1h', // Token expiration time
+      
         });
-
+        console.log(token)
         return res.status(200).json({
             message: 'Login successful',
             token: token,
@@ -197,8 +199,8 @@ const verifyotp = async(req,res,next)=>{
 
 
 module.exports={
-    signup,
-    login,
-    recoverPassword,
-    verifyotp
+  signup,
+  login,
+  verifyotp,
+  recoverPassword
 }

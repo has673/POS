@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const EmployeeController = require('../controllers/EmployeeController');
-
+const { verifyToken}  = require('../middleware/Verify.js');
+// const {verifyToken} = require('../middleware/Verify')
 /**
  * @swagger
  * tags:
@@ -69,7 +70,7 @@ const EmployeeController = require('../controllers/EmployeeController');
  *       500:
  *         description: Internal server error
  */
-router.post("/addemployee", EmployeeController.addemployee);
+router.post("/addemployee",verifyToken, EmployeeController.addemployee);
 
 /**
  * @swagger
@@ -108,7 +109,7 @@ router.post("/addemployee", EmployeeController.addemployee);
  *       500:
  *         description: Internal server error
  */
-router.get('/getemployees', EmployeeController.getemployees);
+router.get('/getemployees',verifyToken,EmployeeController.getemployees);
 
 /**
  * @swagger
@@ -154,7 +155,7 @@ router.get('/getemployees', EmployeeController.getemployees);
  *       500:
  *         description: Internal server error
  */
-router.get('/getemployee/:id', EmployeeController.getemployee);
+router.get('/getemployee/:id', verifyToken, EmployeeController.getemployee);
 
 /**
  * @swagger
@@ -177,7 +178,7 @@ router.get('/getemployee/:id', EmployeeController.getemployee);
  *       500:
  *         description: Internal server error
  */
-router.delete('/deletemployee/:id', EmployeeController.deleteemployee);
+router.delete('/deletemployee/:id', verifyToken, EmployeeController.deleteemployee);
 
 /**
  * @swagger
@@ -246,6 +247,6 @@ router.delete('/deletemployee/:id', EmployeeController.deleteemployee);
  *       500:
  *         description: Internal server error
  */
-router.put('/editemployee/:id', EmployeeController.editemployee);
+router.put('/editemployee/:id' ,verifyToken, EmployeeController.editemployee);
 
 module.exports = router;

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const itemController = require('../controllers/Itemcontroller');
+const { verifyToken } = require('../middleware/Verify');
 
 /**
  * @swagger
@@ -68,7 +69,7 @@ const itemController = require('../controllers/Itemcontroller');
  *       400:
  *         description: Invalid input
  */
-router.post('/additem', itemController.addItem);
+router.post('/additem',verifyToken ,itemController.addItem);
 
 /**
  * @swagger
@@ -107,7 +108,7 @@ router.post('/additem', itemController.addItem);
  *       500:
  *         description: Internal server error
  */
-router.get('/getitem', itemController.allitems);
+router.get('/getitem', verifyToken,itemController.allitems);
 
 /**
  * @swagger
@@ -132,6 +133,6 @@ router.get('/getitem', itemController.allitems);
  *       500:
  *         description: Internal server error
  */
-router.delete('/delitem', itemController.delitem);
+router.delete('/delitem', verifyToken, itemController.delitem);
 
 module.exports = router;
