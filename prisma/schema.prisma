@@ -30,7 +30,7 @@ model Employee {
   Name          String    
   email         String    @unique
   salary        Int?     
-  Phonenumber   BigInt?
+  Phonenumber   Int?
   dateofbirth   DateTime?
   Address        String?
   Details       String?

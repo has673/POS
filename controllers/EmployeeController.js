@@ -3,13 +3,22 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const addemployee = async(req,res,next)=>{
     try{
-        const { Name ,email,salary,Phonenumber, Address} =  req.body
+        const { Name ,email,salary, Address} =  req.body
+        // const { photo } = req.files;
+        const emp = await prisma.employee.findFirst({
+            where:{
+                email:email
+            }
+        })
+        if(emp){
+            return res.status(400).json({message:'employee lareday'})
+        }
         const employee = await prisma.employee.create({
             data:{
                 Name:Name,
                 email:email,
                 salary:salary,
-                Phonenumber:Phonenumber,
+              
                 Address:Address
             },
         })
@@ -18,7 +27,7 @@ const addemployee = async(req,res,next)=>{
     }
     catch(err){
         console.log(err)
-        return res.status(200).json({ error:"internal server error"})
+        return res.status(500).json({ error:"internal server error"})
     }
 }
 const getemployees=async(req,res,next)=>{
@@ -35,10 +44,10 @@ const getemployees=async(req,res,next)=>{
 const getemployee=async(req,res,next)=>{
     try{
         const { id } = req.params;
-
+        console.log(id)
         // Fetch a single employee by ID
         const employee = await prisma.employee.findUnique({
-            where: { id: parseInt(id, 10) }, // Ensure the ID is an integer
+            where: { id: parseInt(id )}, // Ensure the ID is an integer
         });
 
         // Check if employee exists

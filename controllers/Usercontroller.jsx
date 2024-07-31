@@ -2,7 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
-const updatepicture=async(req,res,next)=>{
+const updateprofile=async(req,res,next)=>{
     try{
         
 
@@ -12,5 +12,5 @@ const updatepicture=async(req,res,next)=>{
     }
 }
 module.exports={
-    updatepicture
+    updateprofile
 }
