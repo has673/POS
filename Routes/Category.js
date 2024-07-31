@@ -4,6 +4,8 @@ const router = express.Router()
 
 const CatController = require('../controllers/CategoryController')
 
-router.post("/create", CatController.createitem)
+router.post("/create", CatController.addCategory)
 router.get('/get',CatController.getcat)
+router.put('/update',CatController.editcat)
+router.get('/getmenu',CatController.getmenu)
 module.exports = router;

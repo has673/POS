@@ -2,24 +2,38 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 // Create a new category
-const createitem = async (req, res, next) => {
+const addCategory = async (req, res, next) => {
     try {
-        const { name, menu, description } = req.body;
-        const category = await prisma.category.create({
+        const { name, description, price, availability, categoryId } = req.body;
+
+        // Check if the category exists
+        const category = await prisma.category.findUnique({
+            where: {
+                id: categoryId,
+            },
+        });
+
+        if (!category) {
+            return res.status(400).json({ error: 'Category not found' });
+        }
+
+        // Create the new menu item
+        const newMenuItem = await prisma.menuItem.create({
             data: {
                 name,
-                menu,
-                description
-            }
+                description,
+                price,
+                availability,
+                categoryId,
+            },
         });
-        console.log(category);
-        return res.status(200).json({ category });
+
+        return res.status(201).json(newMenuItem);
     } catch (err) {
         console.error(err);
         return res.status(500).json({ error: 'Internal Server Error' });
     }
 };
-
 // Get all categories
 const getcat = async (req, res, next) => {
     try {
@@ -52,9 +66,34 @@ const editcat = async (req, res, next) => {
         return res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+const getmenu =async(req,res,next)=>{
+    try{
+        const{id}= req.params
+        const allcat = await prisma.category.findFirst({
+            where:{
+                id:parent(id)
+            },
+            include: {
+                menuItems: true, // Include the related menu items
+            },
+        })
 
+        if (!category) {
+            return res.status(404).json({ error: 'Category not found' });
+        }
+        const items = allcat.menuItems
+        return res.status(404).json({ items });
+
+    }
+    catch(err){
+        console.log(err)
+        return res.status(500).json({error:'internal server error'})
+
+    }
+}
 module.exports = {
-    createitem,
+    addCategory,
     getcat,
-    editcat
+    editcat,
+    getmenu
 };
