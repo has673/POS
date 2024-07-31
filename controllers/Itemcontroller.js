@@ -16,14 +16,16 @@ const addItem = async (req, res, next) => {
             return res.status(400).json({ error: 'Category not found' });
         }
 
+        const int = parseInt(categoryId)
+
         // Create the new menu item
         const newMenuItem = await prisma.menuItem.create({
             data: {
-                name,
-                description,
-                price,
-                availability,
-                categoryId,
+                name: name,
+                description: description,
+                price: price,
+                availability: availability,
+                categoryId: int,
             },
         });
 

@@ -71,14 +71,14 @@ const getmenu =async(req,res,next)=>{
         const{id}= req.params
         const allcat = await prisma.category.findFirst({
             where:{
-                id:parent(id)
+                id:parseInt(id)
             },
             include: {
                 menuItems: true, // Include the related menu items
             },
         })
 
-        if (!category) {
+        if (!allcat) {
             return res.status(404).json({ error: 'Category not found' });
         }
         const items = allcat.menuItems
