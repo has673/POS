@@ -87,6 +87,7 @@ const login = async (req, res, next) => {
         const user = await prisma.user.findFirst({
             where: {
                 email: email,
+                verified:true
             },
         });
 

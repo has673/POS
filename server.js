@@ -3,6 +3,8 @@ const app = express();
 const port = process.env.PORT || 3000;
 const Catrouter = require('./Routes/Category');
 const Authrouter = require('./Routes/Auth');
+const Adminrouter =  require('./Routes/Admin')
+const Employeerouter = require('./Routes/Employee')
 // Middleware
 app.use(express.json()); // For parsing application/json
 
@@ -13,6 +15,10 @@ app.get('/', (req, res) => {
 
 app.use('/category', Catrouter);
 app.use('/auth',Authrouter)
+
+app.use('/admin',Adminrouter)
+
+app.use('/employee',Employeerouter)
 
 // Start server
 app.listen(port, () => {
