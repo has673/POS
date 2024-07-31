@@ -85,9 +85,39 @@ const deleteemployee=async(req,res,next)=>{
         return res.status(200).json({ error:"internal server error"})
     }
 }
+
+const editemployee = async(req,res,next)=>{
+    try{
+        const{id}= req.params
+        const { Name ,email,salary, Address} =  req.body
+       
+        const emp = await prisma.employee.findFirst({
+            where:{
+                id:id
+            }
+        })
+        if(!emp){
+            return res.status(400).json({message:'employee doesnt exist'})
+        }
+        const employee = await prisma.employee.update({
+            data:{
+                Name:Name,
+                email:email,
+                salary:salary,
+                Address:Address
+            } ,
+        })
+        return res.status(200).json({employee})
+
+    }
+    catch(err){
+        console.log(err)
+    }
+}
 module.exports={
     addemployee,
     getemployees,
     getemployee,
-    deleteemployee
+    deleteemployee,
+    editemployee
 }
