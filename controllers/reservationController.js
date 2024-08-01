@@ -1,6 +1,17 @@
 const {findCustomerByEmail,addCustomer,addReservation,delReservation,getReservation, findReservation} = require('../services/reservationServices')
-
+const { reservationSchema,customerSchema} = require('../validationSchema')
 const createReservation= async(req,res,next)=>{
+    const { error: reservationError } = reservationSchema.validate(reservation);
+    if (reservationError) {
+        return res.status(400).json({ message: reservationError.details[0].message });
+    }
+
+    const { error: customerError } = customerSchema.validate(customer);
+    if (customerError) {
+        return res.status(400).json({ message: customerError.details[0].message });
+    }
+    
+    
     try{
         const {reservation ,customer} = req.body
         const existingCustomer = await findCustomerByEmail(customer.email)
