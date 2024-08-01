@@ -5,6 +5,8 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer')
 
+const dayjs = require('dayjs');
+
 // const transporter = nodemailer.createTransport({
 //     service: 'Gmail',
 //     auth: {
@@ -43,15 +45,19 @@ const signup = async (req, res, next) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const otp = generateOtp();
-        const otp_int = parseInt(otp)
+        const otp = generateOtp(); // Function to generate OTP
+        const otpInt = parseInt(otp);
+
+        // Set OTP expiry time (e.g., 10 minutes from now)
+        const otpExpiry = dayjs().add(10, 'minute').toDate();
 
         const newUser = await prisma.user.create({
             data: {
                 username: username,
                 email: email,
                 password: hashedPassword,
-                OTP:  otp_int,
+                OTP: otpInt,
+                otpExpiry: otpExpiry, // Store OTP expiry time
             },
         });
 
@@ -59,7 +65,7 @@ const signup = async (req, res, next) => {
             from: process.env.MAILTRAP_USER,
             to: email,
             subject: 'Your OTP Code',
-            text: `Your OTP code is ${ otp_int}`,
+            text: `Your OTP code is ${otpInt}`, // Fixed variable name
         };
 
         transporter.sendMail(mailOptions, (error, info) => {
@@ -69,7 +75,7 @@ const signup = async (req, res, next) => {
             }
             console.log('Email sent: ' + info.response);
             // Ensure the response is sent here
-            const { password: _, otp: __, ...userWithoutSensitiveInfo } = newUser;
+            const { password: _, OTP: __, otpExpiry: ___, ...userWithoutSensitiveInfo } = newUser;
             return res.status(201).json(userWithoutSensitiveInfo);
         });
 
@@ -177,6 +183,26 @@ const verifyotp = async(req,res,next)=>{
         }
 
         // Update user to clear OTP after successful verification
+
+
+        const currentTime = dayjs(); // Use dayjs to get the current time
+        const otpExpiryTime = dayjs(checkuser.otpExpiry); // Assuming `otpExpiry` is a field in your user model
+
+        if (currentTime.isAfter(otpExpiryTime)) {
+            console.error('your otp has expired')
+           
+            await prisma.user.update({
+                where: { email: email },
+                data: { 
+                    OTP: null ,
+                    verified:null,
+                    otpExpiry:null
+    
+                },
+            });
+            return res.status(400).json({ error: 'OTP has expired' });
+        }
+
         await prisma.user.update({
             where: { email: email },
             data: { 
