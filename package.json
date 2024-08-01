@@ -16,6 +16,7 @@
     "dayjs": "^1.11.12",
     "express": "^4.19.2",
     "express-formidable": "^1.2.0",
+    "express-session": "^1.18.0",
     "fs": "^0.0.1-security",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
