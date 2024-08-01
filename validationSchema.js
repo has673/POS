@@ -48,9 +48,30 @@ const menuItemSchema = Joi.object({
     updatedAt: Joi.date().optional()
 });
 
+const reservationSchema = Joi.object({
+    tableNumber: Joi.number().integer().positive().required(),
+    paxNumber: Joi.string().required(),
+    reservationDate: Joi.date().required(),
+    reservationTime: Joi.date().required(),
+    depositFee: Joi.number().positive().required(),
+    status: Joi.string().required(),
+    floor: Joi.number().integer().required(),
+    customerId: Joi.number().integer().positive().required(),
+    paymentMethod: Joi.string().required()
+});
+
+const customerSchema = Joi.object({
+    title: Joi.string().required(),
+    fullName: Joi.string().required(),
+    phoneNumber: Joi.string().required(),
+    emailAddress: Joi.string().email().required()
+});
+
 module.exports = {
     userSchema,
     employeeSchema,
     categorySchema,
-    menuItemSchema
+    menuItemSchema,
+    reservationSchema,
+    customerSchema
 };
