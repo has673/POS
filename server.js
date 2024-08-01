@@ -1,11 +1,11 @@
 const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
-const Catrouter = require('./routes/Category');
-const Authrouter = require('./routes/Auth');
-const Adminrouter = require('./routes/Admin');
-const Employeerouter = require('./routes/Employee');
-const Itemrouter = require('./routes/Item');
+const Catrouter = require('./routes/category');
+const Authrouter = require('./routes/auth');
+const Adminrouter = require('./routes/admin');
+const Employeerouter = require('./routes/employee');
+const Itemrouter = require('./routes/item');
 const { swaggerUi, swaggerSpec } = require('./swagger');
 
 // Middleware

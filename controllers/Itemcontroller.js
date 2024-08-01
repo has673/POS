@@ -1,32 +1,28 @@
-const { PrismaClient } = require('@prisma/client');
+const {
+    findCategoryById,
+    createMenuItem,
+    getAllMenuItems,
+    deleteMenuItemById,
+    updateMenuItem
+} = require('../services/itemServices');
 
-const prisma = new PrismaClient();
 const addItem = async (req, res, next) => {
     try {
         const { name, description, price, availability, categoryId } = req.body;
 
         // Check if the category exists
-        const category = await prisma.category.findUnique({
-            where: {
-                id: categoryId,
-            },
-        });
-
+        const category = await findCategoryById(categoryId);
         if (!category) {
             return res.status(400).json({ error: 'Category not found' });
         }
 
-        const int = parseInt(categoryId)
-
         // Create the new menu item
-        const newMenuItem = await prisma.menuItem.create({
-            data: {
-                name: name,
-                description: description,
-                price: price,
-                availability: availability,
-                categoryId: int,
-            },
+        const newMenuItem = await createMenuItem({
+            name,
+            description,
+            price,
+            availability,
+            categoryId: parseInt(categoryId)
         });
 
         return res.status(201).json(newMenuItem);
@@ -36,68 +32,50 @@ const addItem = async (req, res, next) => {
     }
 };
 
-const allitems = async(req,res,next)=>{
-    try{
-        const items = await prisma.menuItem.findMany()
-        console.log(items)
-        return res.status(200).json(items)
+const allItems = async (req, res, next) => {
+    try {
+        const items = await getAllMenuItems();
+        console.info(items);
+        return res.status(200).json(items);
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Internal Server Error' });
     }
-    catch(err){
-        console.log(err)
-        return res.status(500).json({error:'internal server error'})
+};
 
+const delItem = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const item = await deleteMenuItemById(id);
+        console.info("Item deleted");
+        return res.status(200).json(item);
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Internal Server Error' });
     }
-}
+};
 
-const delitem = async(req,res,next)=>{
-    try{
-        const{id} = res.params
-        const item = await prisma.menuItem.delete({
-            where:{
-                id:id
-            }
-        })
-        console.log("item delted")
-        return res.status(200).json(item)
-    }
-    catch(err){
-        console.log(err)
-        return res.status(500).json({error:'internal server error'})
-
-    }
-}
-
-const edititem = async(req,res,next)=>{
-    try{
-        const{id} = res.params
+const editItem = async (req, res, next) => {
+    try {
+        const { id } = req.params;
         const { name, description, price, availability, categoryId } = req.body;
-        const item = await prisma.menuItem.update({
-            where:{
-                id:id
-            },
-            data:{
-              name:  name,
-             description:  description,
-              price:  price,
-            availability: availability,
-
-            }
-        })
-        console.log("item delted")
-        return res.status(200).json(item)
+        const updatedItem = await updateMenuItem(id, {
+            name,
+            description,
+            price,
+            availability
+        });
+        console.info("Item updated");
+        return res.status(200).json(updatedItem);
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Internal Server Error' });
     }
-    catch(err){
-        console.log(err)
-        return res.status(500).json({error:'internal server error'})
+};
 
-    }
-}
-
-
-module.exports={
+module.exports = {
     addItem,
-    allitems,
-    delitem,
-    edititem
- 
-}
+    allItems,
+    delItem,
+    editItem
+};

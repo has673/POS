@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const itemController = require('../controllers/Itemcontroller');
+const itemController = require('../controllers/itemController');
 const { verifyToken } = require('../middleware/Verify');
 
 /**
@@ -108,7 +108,7 @@ router.post('/additem',verifyToken ,itemController.addItem);
  *       500:
  *         description: Internal server error
  */
-router.get('/getitem', verifyToken,itemController.allitems);
+router.get('/getitem', verifyToken,itemController.allItems);
 
 /**
  * @swagger
@@ -133,6 +133,6 @@ router.get('/getitem', verifyToken,itemController.allitems);
  *       500:
  *         description: Internal server error
  */
-router.delete('/delitem', verifyToken, itemController.delitem);
+router.delete('/delitem', verifyToken, itemController.delItem);
 
 module.exports = router;

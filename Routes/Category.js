@@ -2,12 +2,13 @@ const express = require('express')
 
 const router = express.Router()
 
-const CatController = require('../controllers/CategoryController')
+const categoryController = require('../controllers/categoryController')
+
 const { verifyToken } = require('../middleware/Verify')
 
 
-router.post("/create",verifyToken, CatController.addCategory)
-router.get('/get',verifyToken,CatController.getcat)
-router.put('/update',verifyToken,CatController.editcat)
-router.get('/getmenu/:id',verifyToken,CatController.getmenu)
+router.post("/create",verifyToken, categoryController.addCategory)
+router.get('/get',verifyToken, categoryController.getCat)
+router.put('/update',verifyToken, categoryController.editCat)
+router.get('/getmenu/:id',verifyToken, categoryController.getMenu)
 module.exports = router;

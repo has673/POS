@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const EmployeeController = require('../controllers/EmployeeController');
+const EmployeeController = require('../controllers/EmployeeController.js');
 const { verifyToken}  = require('../middleware/Verify.js');
 // const {verifyToken} = require('../middleware/Verify')
 /**

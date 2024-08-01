@@ -1,27 +1,19 @@
-const { PrismaClient } = require('@prisma/client');
-
-const prisma = new PrismaClient();
+const { createUser } = require("../services/adminservices");
 
 
-const adduser = async(req,res,next)=>{
-    try{
-        const{email,password,username}= req.body
-        const newuser = await prisma.user.create({
-            data:{
-                email:email,
-                password:password,
-                username:username
-            }
-           
-        })
-        console.log(newuser)
-        return res.status(200).json({message:'User Added'})
+
+const addUser = async (req, res, next) => {
+    try {
+        const { email, password, username } = req.body;
+        const newUser = await createUser({ email, password, username });
+        console.log(newUser);
+        return res.status(200).json({ message: 'User Added' });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Internal Server Error' });
     }
-    catch(err){
-        console.log(err)
-        return res.status(200).json({message:'Internal Server Error'})
-    }
-}
-module.exports={
-    adduser
-}
+};
+
+module.exports = {
+    addUser
+};
