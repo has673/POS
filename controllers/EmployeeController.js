@@ -1,8 +1,14 @@
 const { addEmployee,getEmployees,getEmployeeById,deleteEmployeeById,editEmployee,findEmployeeByEmail, findEmployeeById } = require("../services/employeeService")
 
-
+const { employeeSchema} = require('../validationSchema')
+const Joi = require('joi');
 const addemployee = async(req,res,next)=>{
+    const { error } = employeeSchema.validate(req.body);
+    if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+    }
     try{
+        
         const { Name ,email,salary, Address} =  req.body
         const emp = await findEmployeeByEmail(email)
         if(emp){

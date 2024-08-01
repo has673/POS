@@ -5,8 +5,13 @@ const {
     updateCategory,
     getCategoryWithMenuItems
 } = require("../services/categoryServices");
+const {categorySchema} = require('../validationSchema')
 
 const addCategory = async (req, res, next) => {
+    const { error } = categorySchema.validate(req.body);
+    if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+    }
     try {
         const { name, description, price, availability, categoryId } = req.body;
 
