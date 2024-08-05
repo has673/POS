@@ -195,7 +195,7 @@ const verifyotp = async(req,res,next)=>{
                 where: { email: email },
                 data: { 
                     OTP: null ,
-                    verified:null,
+                    verified:true,
                     otpExpiry:null
     
                 },
@@ -220,7 +220,48 @@ const verifyotp = async(req,res,next)=>{
     }
 }
 
+const newotp=async(req,res)=>{
+    try{
+        const {email}= req.body
+        const otp = generateOtp(); // Function to generate OTP
+        const otpInt = parseInt(otp);
+        const otpExpiry = dayjs().add(10, 'minute').toDate();
 
+        const user = await prisma.user.update({
+            where:{
+                email:email,           
+
+            },
+            data:{
+                otp:otpInt,
+                otpExpiry:otpExpiry,
+            }
+        })
+
+        const mailOptions = {
+            from: process.env.MAILTRAP_USER,
+            to: email,
+            subject: 'Your OTP Code',
+            text: `Your OTP code is ${otpInt}`, // Fixed variable name
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error(error);
+                return res.status(500).json({ error: 'Error sending OTP' });
+            }
+            console.log('Email sent: ' + info.response);
+            // Ensure the response is sent here
+            const { password: _, OTP: __, otpExpiry: ___, ...userWithoutSensitiveInfo } = newUser;
+            return res.status(201).json(userWithoutSensitiveInfo);
+        });
+
+
+    }
+    catch(err){
+        console.error(err)
+    }
+}
 
 
 
@@ -228,5 +269,6 @@ module.exports={
   signup,
   login,
   verifyotp,
-  recoverPassword
+  recoverPassword,
+  newotp
 }

@@ -5,6 +5,8 @@ const passport = require('passport');
 const app = express();
 const path = require('path');
 require('./passport')
+
+require("./rateLimiter")
 const port = process.env.PORT || 3000;
 const Catrouter = require('./routes/category');
 const Authrouter = require('./routes/auth');
