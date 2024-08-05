@@ -1,9 +1,13 @@
 const express = require('express');
 const rateLimiter = require('./rateLimiter')
+const bodyParser = require('body-parser');
+
 const session = require('express-session');
 const passport = require('passport');
 const app = express();
+
 const path = require('path');
+
 require('./passport')
 
 require('./rateLimiter')
@@ -19,6 +23,8 @@ const { swaggerUi, swaggerSpec } = require('./swagger');
 app.use(express.json()); // For parsing application/json
 
 // Swagger documentation route
+
+app.use(bodyParser.json());
 
 function Logincheck(req,res,next){
     req.user? next() : res.status(401)

@@ -6,22 +6,42 @@ const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer')
 
 const dayjs = require('dayjs');
+;
+const { google } = require('googleapis');
+const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
 
+// These id's and secrets should come from .env file.
+const oAuth2Client = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    REDIRECT_URI
+  );
+  oAuth2Client.setCredentials({ refresh_token: process.env.refresh_token });
+  const generateAccessToken = async () => {
+    const { token } = await oAuth2Client.getAccessToken();
+    return token;
+};
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      type: 'OAuth2',
+      user: process.env.GMAIL_USER,
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      refreshToken: process.env.refresh_token,
+      accessToken: async () => {
+        return await generateAccessToken();
+    },
+},
+  });
 // const transporter = nodemailer.createTransport({
-//     service: 'Gmail',
+//     host: 'smtp.mailtrap.io',
+//     port: 587,
 //     auth: {
-//         user: process.env.EMAIL_USER,
-//         pass: process.env.EMAIL_PASS
+//         user: process.env.MAILTRAP_USER,
+//         pass: process.env.MAILTRAP_PASS
 //     }
 // });
-const transporter = nodemailer.createTransport({
-    host: 'smtp.mailtrap.io',
-    port: 587,
-    auth: {
-        user: process.env.MAILTRAP_USER,
-        pass: process.env.MAILTRAP_PASS
-    }
-});
 
 
 const generateOtp = () => Math.floor(100000 + Math.random() * 900000); 
@@ -61,24 +81,43 @@ const signup = async (req, res) => {
             },
         });
 
+        // const mailOptions = {
+        //     from: process.env.MAILTRAP_USER,
+        //     to: email,
+        //     subject: 'Your OTP Code',
+        //     text: `Your OTP code is ${otpInt}`, // Fixed variable name
+        // };
+
+        // transporter.sendMail(mailOptions, (error, info) => {
+        //     if (error) {
+        //         console.error(error);
+        //         return res.status(500).json({ error: 'Error sending OTP' });
+        //     }
+        //     console.log('Email sent: ' + info.response);
+        //     // Ensure the response is sent here
+        //     const { password: _, OTP: __, otpExpiry: ___, ...userWithoutSensitiveInfo } = newUser;
+        //     return res.status(201).json(userWithoutSensitiveInfo);
+        // });
+
         const mailOptions = {
-            from: process.env.MAILTRAP_USER,
+            from: process.env.GMAIL_USER, // Use the email address configured for sending
             to: email,
             subject: 'Your OTP Code',
-            text: `Your OTP code is ${otpInt}`, // Fixed variable name
+            text: `Your OTP code is ${otpInt}`,
         };
-
-        transporter.sendMail(mailOptions, (error, info) => {
+         
+        transporter.sendMail(mailOptions, async (error, info) => {
             if (error) {
-                console.error(error);
+                console.error('Error sending OTP:', error);
                 return res.status(500).json({ error: 'Error sending OTP' });
             }
-            console.log('Email sent: ' + info.response);
-            // Ensure the response is sent here
-            const { password: _, OTP: __, otpExpiry: ___, ...userWithoutSensitiveInfo } = newUser;
-            return res.status(201).json(userWithoutSensitiveInfo);
+            console.log('Email sent:', info.response);
+        
+            // Ensure newUser is available or fetch it if needed
+            // const { password: _, OTP: __, otpExpiry: ___, ...userWithoutSensitiveInfo } = newUser;
+        
+            return res.status(201).json('ok');
         });
-
     } catch (err) {
         console.error(err);
         return res.status(500).json({ error: 'Internal Server Error' });
@@ -238,22 +277,41 @@ const newotp=async(req,res)=>{
             }
         })
 
+        // const mailOptions = {
+        //     from: process.env.MAILTRAP_USER,
+        //     to: email,
+        //     subject: 'Your OTP Code',
+        //     text: `Your OTP code is ${otpInt}`, // Fixed variable name
+        // };
+
+        // transporter.sendMail(mailOptions, (error, info) => {
+        //     if (error) {
+        //         console.error(error);
+        //         return res.status(500).json({ error: 'Error sending OTP' });
+        //     }
+        //     console.log('Email sent: ' + info.response);
+        //     // Ensure the response is sent here
+            
+        //     const { password: _, OTP: __, otpExpiry: ___, ...userWithoutSensitiveInfo } = newUser;
+        //     return res.status(201).json('ok');
+        // });
         const mailOptions = {
-            from: process.env.MAILTRAP_USER,
+            from: process.env.GMAIL_USER, // Use the email address configured for sending
             to: email,
             subject: 'Your OTP Code',
-            text: `Your OTP code is ${otpInt}`, // Fixed variable name
+            text: `Your OTP code is ${otpInt}`,
         };
-
-        transporter.sendMail(mailOptions, (error, info) => {
+         
+        transporter.sendMail(mailOptions, async (error, info) => {
             if (error) {
-                console.error(error);
+                console.error('Error sending OTP:', error);
                 return res.status(500).json({ error: 'Error sending OTP' });
             }
-            console.log('Email sent: ' + info.response);
-            // Ensure the response is sent here
-            
-            const { password: _, OTP: __, otpExpiry: ___, ...userWithoutSensitiveInfo } = newUser;
+            console.log('Email sent:', info.response);
+        
+            // Ensure newUser is available or fetch it if needed
+            // const { password: _, OTP: __, otpExpiry: ___, ...userWithoutSensitiveInfo } = newUser;
+        
             return res.status(201).json('ok');
         });
 
