@@ -26,7 +26,7 @@ const transporter = nodemailer.createTransport({
 
 const generateOtp = () => Math.floor(100000 + Math.random() * 900000); 
 
-const signup = async (req, res, next) => {
+const signup = async (req, res) => {
     try {
         const { username, email, password } = req.body;
 
