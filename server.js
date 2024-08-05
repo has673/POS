@@ -6,7 +6,7 @@ const app = express();
 const path = require('path');
 require('./passport')
 
-require("./rateLimiter")
+require('./rateLimiter')
 const port = process.env.PORT || 3000;
 const Catrouter = require('./routes/category');
 const Authrouter = require('./routes/auth');
@@ -24,7 +24,7 @@ function Logincheck(req,res,next){
     req.user? next() : res.status(401)
 
 }
-app.use(rateLimiter)
+
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 

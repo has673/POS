@@ -233,7 +233,7 @@ const newotp=async(req,res)=>{
 
             },
             data:{
-                otp:otpInt,
+                OTP:otpInt,
                 otpExpiry:otpExpiry,
             }
         })
@@ -252,8 +252,9 @@ const newotp=async(req,res)=>{
             }
             console.log('Email sent: ' + info.response);
             // Ensure the response is sent here
+            
             const { password: _, OTP: __, otpExpiry: ___, ...userWithoutSensitiveInfo } = newUser;
-            return res.status(201).json(userWithoutSensitiveInfo);
+            return res.status(201).json('ok');
         });
 
 
